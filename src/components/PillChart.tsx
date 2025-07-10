@@ -3,35 +3,43 @@ interface ChartData {
   day: string;
   date: string;
   pillsTaken: number;
+  totalScheduled: number;
 }
 const chartData: ChartData[] = [{
   day: 'Mon',
   date: '15',
-  pillsTaken: 6
+  pillsTaken: 6,
+  totalScheduled: 8
 }, {
   day: 'Tue',
   date: '16',
-  pillsTaken: 4
+  pillsTaken: 4,
+  totalScheduled: 8
 }, {
   day: 'Wed',
   date: '17',
-  pillsTaken: 8
+  pillsTaken: 8,
+  totalScheduled: 8
 }, {
   day: 'Thu',
   date: '18',
-  pillsTaken: 5
+  pillsTaken: 5,
+  totalScheduled: 8
 }, {
   day: 'Fri',
   date: '19',
-  pillsTaken: 7
+  pillsTaken: 7,
+  totalScheduled: 8
 }, {
   day: 'Sat',
   date: '20',
-  pillsTaken: 3
+  pillsTaken: 3,
+  totalScheduled: 6
 }, {
   day: 'Sun',
   date: '21',
-  pillsTaken: 6
+  pillsTaken: 6,
+  totalScheduled: 8
 }];
 const PillChart: React.FC = () => {
   const maxPills = Math.max(...chartData.map(d => d.pillsTaken));
@@ -44,7 +52,7 @@ const PillChart: React.FC = () => {
         return <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
               {/* Pill count - always visible */}
               <div className="text-sm font-bold text-primary mb-2 min-h-[20px] flex items-end">
-                {data.pillsTaken}
+                {data.pillsTaken}/{data.totalScheduled}
               </div>
               
               {/* Bar Container */}
