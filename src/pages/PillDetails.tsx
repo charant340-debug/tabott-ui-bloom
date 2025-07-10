@@ -212,7 +212,7 @@ const PillDetails = () => {
             <div className="mt-6 pt-6 border-t border-border/20">
               <h3 className="text-lg font-semibold text-foreground mb-4">Schedule</h3>
               <div className="space-y-3">
-                {generateScheduleTimes(pillData.scheduledDoses).map((time, index) => (
+                {generateScheduleTimes(3).map((time, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-card/20 rounded-lg border border-border/10">
                     <div>
                       <div className="font-medium text-foreground">
