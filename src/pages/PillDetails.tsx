@@ -185,24 +185,27 @@ const PillDetails = () => {
       <main className="pt-96 pb-8">
         <div className="container mx-auto px-6">
           <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-xl p-6 border border-border/50 backdrop-blur-sm">
-            {/* Pill Info Header with Pills Left */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
+            
+            {/* Header Section */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
                 <h2 className="text-2xl font-bold text-foreground mb-2">{pillData.name}</h2>
-                <div className="text-sm text-muted-foreground mb-3">
+                <div className="text-sm text-muted-foreground">
                   Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken}</span>
-                </div>
-                <div className="text-center p-4 bg-card/50 rounded-lg border border-border/30">
-                  <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
-                  <div className="text-3xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
-                  <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
-                    {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
-                  </div>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-sm text-muted-foreground mb-1">Next Intake</div>
                 <div className="text-lg font-semibold text-primary">{pillData.nextIntake}</div>
+              </div>
+            </div>
+
+            {/* Pills Left Section */}
+            <div className="text-center mb-6 p-4 bg-card/50 rounded-lg border border-border/30">
+              <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
+              <div className="text-3xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
+              <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
+                {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
               </div>
             </div>
 
@@ -216,9 +219,10 @@ const PillDetails = () => {
             </div>
 
             {/* Daily Schedule */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h3 className="text-lg font-semibold text-foreground mb-4">Today's Schedule</h3>
-              {generateScheduleTimes(pillData.scheduledDoses).map((time, index) => <div key={index} className="flex items-center justify-between p-4 bg-card/20 rounded-lg border border-border/10">
+              {generateScheduleTimes(pillData.scheduledDoses).map((time, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-card/20 rounded-lg border border-border/10">
                   <div>
                     <div className="font-medium text-foreground">
                       {index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'} Dose
@@ -229,7 +233,8 @@ const PillDetails = () => {
                     <div className="font-semibold text-primary">{time}</div>
                     <div className="text-xs text-muted-foreground">Today, Jul 21</div>
                   </div>
-                </div>)}
+                </div>
+              ))}
             </div>
           </div>
         </div>
