@@ -1,0 +1,79 @@
+import React from 'react';
+import { Clock, Package } from 'lucide-react';
+
+interface PillCardProps {
+  pillName: string;
+  pillsLeft: number;
+  lastTaken?: string;
+  nextIntake: string;
+  index: number;
+}
+
+const PillCard: React.FC<PillCardProps> = ({ 
+  pillName, 
+  pillsLeft, 
+  lastTaken, 
+  nextIntake, 
+  index 
+}) => {
+  const isLowStock = pillsLeft <= 5;
+  
+  return (
+    <div 
+      className="bg-gradient-pill-card backdrop-blur-sm rounded-lg p-6 border border-border/50 transition-all duration-300 hover:scale-105 hover:shadow-card animate-fade-in"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-lg font-bold text-foreground truncate pr-2">
+          {pillName}
+        </h3>
+        {lastTaken && (
+          <div className="text-right">
+            <div className="text-xs text-muted-foreground">Last Taken</div>
+            <div className="text-sm font-medium text-secondary">{lastTaken}</div>
+          </div>
+        )}
+      </div>
+
+      {/* Pills Left - Center Focus */}
+      <div className="flex items-center gap-3 mb-4">
+        <Package className={`h-6 w-6 ${isLowStock ? 'text-destructive' : 'text-primary'}`} />
+        <div>
+          <div className="text-sm text-muted-foreground">Pills Left</div>
+          <div className={`text-3xl font-bold ${isLowStock ? 'text-destructive' : 'text-primary'}`}>
+            {pillsLeft}
+          </div>
+        </div>
+        {isLowStock && (
+          <div className="ml-auto">
+            <span className="bg-destructive/20 text-destructive px-2 py-1 rounded-full text-xs font-medium">
+              Low Stock
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Next Intake */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-accent" />
+          <div className="text-sm text-muted-foreground">Next Intake</div>
+        </div>
+        <div className="text-sm font-medium text-accent">{nextIntake}</div>
+      </div>
+
+      {/* Status Indicator */}
+      <div className="mt-4 pt-3 border-t border-border/30">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${isLowStock ? 'bg-destructive animate-pulse' : 'bg-success'}`} />
+          <span className="text-xs text-muted-foreground">
+            {isLowStock ? 'Refill Needed' : 'Stock OK'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PillCard;
