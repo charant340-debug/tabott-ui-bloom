@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Pill } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -114,6 +114,12 @@ const PillDetails = () => {
   const [dynamicSchedule, setDynamicSchedule] = React.useState(true);
   const pillId = parseInt(id || '1');
   const pillData = pillDetailsData[pillId as keyof typeof pillDetailsData];
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   if (!pillData) {
     return <div>Pill not found</div>;
   }
