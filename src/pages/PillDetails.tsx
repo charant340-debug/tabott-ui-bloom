@@ -190,12 +190,31 @@ const PillDetails = () => {
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-foreground mb-3">{pillData.name}</h2>
-                {/* Pills Left Section */}
-                <div className="bg-card/50 rounded-lg p-3 border border-border/30 mb-2">
-                  <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
-                  <div className="text-2xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
-                  <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
-                    {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
+                {/* Pills Left and Today's Status */}
+                <div className="flex gap-3">
+                  <div className="bg-card/50 rounded-lg p-3 border border-border/30 flex-1">
+                    <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
+                    <div className="text-2xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
+                    <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
+                      {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
+                    </div>
+                  </div>
+                  <div className="bg-card/50 rounded-lg p-3 border border-border/30 flex-1">
+                    <div className="text-sm text-muted-foreground mb-2">Today's Status</div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Taken</span>
+                        <span className="text-success font-medium">2</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">To Take</span>
+                        <span className="text-primary font-medium">1</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Skipped</span>
+                        <span className="text-muted-foreground font-medium">0</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
