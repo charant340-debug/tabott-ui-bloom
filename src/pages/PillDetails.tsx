@@ -208,32 +208,25 @@ const PillDetails = () => {
               </div>
             </div>
 
-            {/* Dynamic Schedule Toggle */}
-            <div className="flex items-center justify-between p-4 bg-card/30 rounded-lg border border-border/20 mb-6">
-              <div>
-                <div className="font-medium text-foreground">Dynamic Schedule</div>
-                <div className="text-sm text-muted-foreground">Automatically adjust timing based on habits</div>
-              </div>
-              <Switch checked={dynamicSchedule} onCheckedChange={setDynamicSchedule} />
-            </div>
-
             {/* Daily Schedule */}
-            <div className="space-y-3">
+            <div className="mt-6 pt-6 border-t border-border/20">
               <h3 className="text-lg font-semibold text-foreground mb-4">Today's Schedule</h3>
-              {generateScheduleTimes(pillData.scheduledDoses).map((time, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-card/20 rounded-lg border border-border/10">
-                  <div>
-                    <div className="font-medium text-foreground">
-                      {index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'} Dose
+              <div className="space-y-3">
+                {generateScheduleTimes(pillData.scheduledDoses).map((time, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-card/20 rounded-lg border border-border/10">
+                    <div>
+                      <div className="font-medium text-foreground">
+                        {index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'} Dose
+                      </div>
+                      <div className="text-sm text-muted-foreground">Daily medication</div>
                     </div>
-                    <div className="text-sm text-muted-foreground">Daily medication</div>
+                    <div className="text-right">
+                      <div className="font-semibold text-primary">{time}</div>
+                      <div className="text-xs text-muted-foreground">Today, Jul 21</div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-primary">{time}</div>
-                    <div className="text-xs text-muted-foreground">Today, Jul 21</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
