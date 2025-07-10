@@ -200,19 +200,19 @@ const PillDetails = () => {
                     </div>
                   </div>
                   <div className="bg-card/50 rounded-lg p-3 border border-border/30 flex-1">
-                    <div className="text-sm text-muted-foreground mb-2">Today's Status</div>
+                    <div className="text-sm text-muted-foreground mb-2 font-medium">Today's Status</div>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Taken</span>
-                        <span className="text-success font-medium">2</span>
+                        <span className="text-foreground/80 font-medium">Taken</span>
+                        <span className="text-success font-semibold">2</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">To Take</span>
-                        <span className="text-primary font-medium">1</span>
+                        <span className="text-foreground/80 font-medium">To Take</span>
+                        <span className="text-primary font-semibold">1</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Skipped</span>
-                        <span className="text-muted-foreground font-medium">0</span>
+                        <span className="text-foreground/80 font-medium">Skipped</span>
+                        <span className="text-foreground/60 font-semibold">0</span>
                       </div>
                     </div>
                   </div>
