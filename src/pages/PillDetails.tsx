@@ -71,12 +71,12 @@ const pillDetailsData = {
 const generateChartData = (scheduledDoses: number): PillChartData[] => [{
   day: 'Mon',
   date: '15',
-  pillsTaken: Math.min(scheduledDoses, Math.floor(Math.random() * scheduledDoses) + 1),
+  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }, {
   day: 'Tue',
   date: '16',
-  pillsTaken: Math.min(scheduledDoses, Math.floor(Math.random() * scheduledDoses) + 1),
+  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }, {
   day: 'Wed',
@@ -86,22 +86,22 @@ const generateChartData = (scheduledDoses: number): PillChartData[] => [{
 }, {
   day: 'Thu',
   date: '18',
-  pillsTaken: Math.min(scheduledDoses, Math.floor(Math.random() * scheduledDoses) + 1),
+  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }, {
   day: 'Fri',
   date: '19',
-  pillsTaken: Math.min(scheduledDoses, Math.floor(Math.random() * scheduledDoses) + 1),
+  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }, {
   day: 'Sat',
   date: '20',
-  pillsTaken: Math.min(scheduledDoses, Math.floor(Math.random() * scheduledDoses) + 1),
+  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }, {
   day: 'Sun',
   date: '21',
-  pillsTaken: scheduledDoses,
+  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }];
 const PillDetails = () => {
