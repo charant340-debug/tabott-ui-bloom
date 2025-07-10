@@ -35,10 +35,10 @@ const chartData: ChartData[] = [{
 }];
 const PillChart: React.FC = () => {
   const maxPills = Math.max(...chartData.map(d => d.pillsTaken));
-  return <div className="bg-card rounded-lg p-6 h-full border border-border">
+  return <div className="bg-card rounded-lg p-6 h-full border border-border flex flex-col">
       
       
-      <div className="flex items-end justify-between h-56 gap-3">
+      <div className="flex items-end justify-between flex-1 gap-3">
         {chartData.map((data, index) => {
         const height = data.pillsTaken / maxPills * 100;
         return <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
