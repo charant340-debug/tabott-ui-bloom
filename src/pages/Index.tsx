@@ -43,8 +43,8 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="pt-20">
-        {/* Top Section - Fixed Height */}
-        <section className="h-80 px-6 py-6">
+        {/* Top Section - Fixed Height Chart Area */}
+        <section className="h-96 px-6 py-6 border-b border-border">
           <div className="container mx-auto h-full">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
               {/* Chart - 3/4 width */}
@@ -60,8 +60,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Bottom Section - Scrollable Pills */}
-        <section className="px-6 pb-6">
+        {/* Bottom Section - Pill Cards */}
+        <section className="px-6 py-6">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {pillsData.map((pill, index) => (

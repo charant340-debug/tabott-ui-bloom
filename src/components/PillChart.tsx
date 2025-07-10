@@ -23,36 +23,49 @@ const PillChart: React.FC = () => {
     <div className="bg-card rounded-lg p-6 h-full border border-border">
       <h3 className="text-lg font-semibold text-foreground mb-6">7-Day Pill Intake</h3>
       
-      <div className="flex items-end justify-between h-64 gap-2">
+      <div className="flex items-end justify-between h-56 gap-3">
         {chartData.map((data, index) => {
           const height = (data.pillsTaken / maxPills) * 100;
           
           return (
-            <div key={data.day} className="flex-1 flex flex-col items-center group">
-              {/* Pill count at top of bar */}
-              <div className="text-sm font-medium text-primary mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
+              {/* Pill count - always visible */}
+              <div className="text-sm font-bold text-primary mb-2 min-h-[20px] flex items-end">
                 {data.pillsTaken}
               </div>
               
-              {/* Bar */}
-              <div className="w-full flex flex-col items-center justify-end flex-1 relative">
+              {/* Bar Container */}
+              <div className="w-full flex flex-col items-center justify-end h-40 relative">
                 <div
-                  className="w-full bg-gradient-to-t from-primary/60 to-primary/80 rounded-t-md transition-all duration-500 hover:from-primary/80 hover:to-primary group-hover:shadow-glow cursor-pointer"
+                  className="w-full bg-gradient-to-t from-primary/60 to-primary/90 rounded-t-lg transition-all duration-700 hover:from-primary/80 hover:to-primary group-hover:shadow-glow relative overflow-hidden"
                   style={{ 
-                    height: `${height}%`,
-                    animationDelay: `${index * 100}ms`
+                    height: `${Math.max(height, 8)}%`, // Minimum 8% height for visibility
+                    animationDelay: `${index * 150}ms`
                   }}
-                />
+                >
+                  {/* Shimmer effect on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                </div>
               </div>
               
-              {/* Day and date */}
-              <div className="text-center mt-2">
-                <div className="text-xs font-medium text-muted-foreground">{data.day}</div>
-                <div className="text-xs text-muted-foreground/70">{data.date}</div>
+              {/* Day and date labels */}
+              <div className="text-center mt-3 space-y-1">
+                <div className="text-sm font-semibold text-foreground">{data.day}</div>
+                <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded">
+                  {data.date}
+                </div>
               </div>
             </div>
           );
         })}
+      </div>
+      
+      {/* Chart legend */}
+      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-gradient-to-t from-primary/60 to-primary/90 rounded"></div>
+          <span>Pills taken per day</span>
+        </div>
       </div>
     </div>
   );
