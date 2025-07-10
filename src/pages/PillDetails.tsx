@@ -189,23 +189,22 @@ const PillDetails = () => {
             {/* Header Section */}
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-foreground mb-2">{pillData.name}</h2>
-                <div className="text-sm text-muted-foreground">
-                  Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken}</span>
+                <h2 className="text-2xl font-bold text-foreground mb-3">{pillData.name}</h2>
+                {/* Pills Left Section */}
+                <div className="bg-card/50 rounded-lg p-3 border border-border/30 mb-2">
+                  <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
+                  <div className="text-2xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
+                  <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
+                    {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
+                  </div>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-sm text-muted-foreground mb-1">Next Intake</div>
-                <div className="text-lg font-semibold text-primary">{pillData.nextIntake}</div>
-              </div>
-            </div>
-
-            {/* Pills Left Section */}
-            <div className="text-center mb-6 p-4 bg-card/50 rounded-lg border border-border/30">
-              <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
-              <div className="text-3xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
-              <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
-                {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
+                <div className="text-lg font-semibold text-primary mb-2">{pillData.nextIntake}</div>
+                <div className="text-sm text-muted-foreground">
+                  Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken}</span>
+                </div>
               </div>
             </div>
 
