@@ -232,6 +232,22 @@ const PillDetails = () => {
                 ))}
               </div>
             </div>
+
+            {/* Dynamic Schedule Toggle */}
+            <div className="flex items-center justify-between p-4 bg-card/30 rounded-lg border border-border/20 mt-6 mb-6">
+              <div>
+                <div className="font-medium text-foreground">Dynamic Schedule</div>
+                <div className="text-sm text-muted-foreground">Automatically adjust timing based on habits</div>
+              </div>
+              <Switch checked={dynamicSchedule} onCheckedChange={setDynamicSchedule} />
+            </div>
+
+            {/* Reschedule Button */}
+            <div className="flex justify-center mt-8">
+              <button className="bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-elegant">
+                Reschedule
+              </button>
+            </div>
           </div>
         </div>
       </main>
