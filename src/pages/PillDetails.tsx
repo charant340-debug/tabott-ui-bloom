@@ -185,26 +185,24 @@ const PillDetails = () => {
       <main className="pt-96 pb-8">
         <div className="container mx-auto px-6">
           <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-xl p-6 border border-border/50 backdrop-blur-sm">
-            {/* Pill Info Header */}
+            {/* Pill Info Header with Pills Left */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">{pillData.name}</h2>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground mb-3">
                   Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken}</span>
+                </div>
+                <div className="text-center p-4 bg-card/50 rounded-lg border border-border/30">
+                  <div className="text-sm text-muted-foreground mb-1">Pills Left in Device</div>
+                  <div className="text-3xl font-bold text-primary mb-1">{pillData.pillsLeft}</div>
+                  <div className={`text-xs font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
+                    {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
+                  </div>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-sm text-muted-foreground mb-1">Next Intake</div>
                 <div className="text-lg font-semibold text-primary">{pillData.nextIntake}</div>
-              </div>
-            </div>
-
-            {/* Pills Left - Prominent Display */}
-            <div className="text-center mb-8 p-6 bg-card/50 rounded-lg border border-border/30">
-              <div className="text-sm text-muted-foreground mb-2">Pills Left in Device</div>
-              <div className="text-4xl font-bold text-primary mb-2">{pillData.pillsLeft}</div>
-              <div className={`text-sm font-medium ${pillData.pillsLeft <= 5 ? 'text-destructive' : 'text-success'}`}>
-                {pillData.pillsLeft <= 5 ? 'Low Stock - Refill Soon' : 'Stock Level Good'}
               </div>
             </div>
 
