@@ -65,14 +65,14 @@ const Reschedule = () => {
             <CardContent>
               <Select value={interval} onValueChange={setInterval}>
                 <SelectTrigger className="w-full bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/20">
-                  <SelectValue placeholder="Select interval" />
+                  <SelectValue placeholder="0-30" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">Daily (Every day)</SelectItem>
-                  <SelectItem value="1">Every 2 days</SelectItem>
-                  <SelectItem value="2">Every 3 days</SelectItem>
-                  <SelectItem value="3">Every 4 days</SelectItem>
-                  <SelectItem value="6">Weekly (Every 7 days)</SelectItem>
+                  {Array.from({ length: 31 }, (_, i) => (
+                    <SelectItem key={i} value={i.toString()}>
+                      {i === 0 ? "Daily (Every day)" : `Every ${i + 1} days`}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </CardContent>
