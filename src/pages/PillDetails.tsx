@@ -263,7 +263,10 @@ const PillDetails = () => {
 
             {/* Reschedule Button */}
             <div className="flex justify-center mt-8">
-              <button className="bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-elegant">
+              <button 
+                onClick={() => navigate(`/pill/${id}/reschedule`)}
+                className="bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-elegant"
+              >
                 Reschedule
               </button>
             </div>
