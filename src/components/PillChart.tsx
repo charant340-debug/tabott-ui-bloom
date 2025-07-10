@@ -1,34 +1,47 @@
 import React from 'react';
-
 interface ChartData {
   day: string;
   date: string;
   pillsTaken: number;
 }
-
-const chartData: ChartData[] = [
-  { day: 'Mon', date: '15', pillsTaken: 6 },
-  { day: 'Tue', date: '16', pillsTaken: 4 },
-  { day: 'Wed', date: '17', pillsTaken: 8 },
-  { day: 'Thu', date: '18', pillsTaken: 5 },
-  { day: 'Fri', date: '19', pillsTaken: 7 },
-  { day: 'Sat', date: '20', pillsTaken: 3 },
-  { day: 'Sun', date: '21', pillsTaken: 6 },
-];
-
+const chartData: ChartData[] = [{
+  day: 'Mon',
+  date: '15',
+  pillsTaken: 6
+}, {
+  day: 'Tue',
+  date: '16',
+  pillsTaken: 4
+}, {
+  day: 'Wed',
+  date: '17',
+  pillsTaken: 8
+}, {
+  day: 'Thu',
+  date: '18',
+  pillsTaken: 5
+}, {
+  day: 'Fri',
+  date: '19',
+  pillsTaken: 7
+}, {
+  day: 'Sat',
+  date: '20',
+  pillsTaken: 3
+}, {
+  day: 'Sun',
+  date: '21',
+  pillsTaken: 6
+}];
 const PillChart: React.FC = () => {
   const maxPills = Math.max(...chartData.map(d => d.pillsTaken));
-
-  return (
-    <div className="bg-card rounded-lg p-6 h-full border border-border">
-      <h3 className="text-lg font-semibold text-foreground mb-6">7-Day Pill Intake</h3>
+  return <div className="bg-card rounded-lg p-6 h-full border border-border">
+      
       
       <div className="flex items-end justify-between h-56 gap-3">
         {chartData.map((data, index) => {
-          const height = (data.pillsTaken / maxPills) * 100;
-          
-          return (
-            <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
+        const height = data.pillsTaken / maxPills * 100;
+        return <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
               {/* Pill count - always visible */}
               <div className="text-sm font-bold text-primary mb-2 min-h-[20px] flex items-end">
                 {data.pillsTaken}
@@ -36,13 +49,11 @@ const PillChart: React.FC = () => {
               
               {/* Bar Container */}
               <div className="w-full flex flex-col items-center justify-end h-40 relative">
-                <div
-                  className="w-full bg-gradient-to-t from-primary/60 to-primary/90 rounded-t-lg transition-all duration-700 hover:from-primary/80 hover:to-primary group-hover:shadow-glow relative overflow-hidden"
-                  style={{ 
-                    height: `${Math.max(height, 8)}%`, // Minimum 8% height for visibility
-                    animationDelay: `${index * 150}ms`
-                  }}
-                >
+                <div className="w-full bg-gradient-to-t from-primary/60 to-primary/90 rounded-t-lg transition-all duration-700 hover:from-primary/80 hover:to-primary group-hover:shadow-glow relative overflow-hidden" style={{
+              height: `${Math.max(height, 8)}%`,
+              // Minimum 8% height for visibility
+              animationDelay: `${index * 150}ms`
+            }}>
                   {/* Shimmer effect on hover */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000" />
                 </div>
@@ -55,9 +66,8 @@ const PillChart: React.FC = () => {
                   {data.date}
                 </div>
               </div>
-            </div>
-          );
-        })}
+            </div>;
+      })}
       </div>
       
       {/* Chart legend */}
@@ -67,8 +77,6 @@ const PillChart: React.FC = () => {
           <span>Pills taken per day</span>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default PillChart;
