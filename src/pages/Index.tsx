@@ -64,16 +64,17 @@ const Index = () => {
         <section className="px-6 py-8 relative z-10 bg-background mt-12">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {pillsData.map((pill, index) => (
-                <PillCard
-                  key={pill.id}
-                  pillName={pill.name}
-                  pillsLeft={pill.pillsLeft}
-                  lastTaken={pill.lastTaken}
-                  nextIntake={pill.nextIntake}
-                  index={index}
-                />
-              ))}
+            {pillsData.map((pill, index) => (
+              <PillCard
+                key={pill.id}
+                pillId={pill.id}
+                pillName={pill.name}
+                pillsLeft={pill.pillsLeft}
+                lastTaken={pill.lastTaken}
+                nextIntake={pill.nextIntake}
+                index={index}
+              />
+            ))}
             </div>
           </div>
         </section>

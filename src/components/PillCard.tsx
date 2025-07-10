@@ -1,7 +1,9 @@
 import React from 'react';
 import { Clock, Package } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface PillCardProps {
+  pillId: number;
   pillName: string;
   pillsLeft: number;
   lastTaken?: string;
@@ -10,18 +12,25 @@ interface PillCardProps {
 }
 
 const PillCard: React.FC<PillCardProps> = ({ 
+  pillId,
   pillName, 
   pillsLeft, 
   lastTaken, 
   nextIntake, 
   index 
 }) => {
+  const navigate = useNavigate();
   const isLowStock = pillsLeft <= 5;
+  
+  const handleClick = () => {
+    navigate(`/pill/${pillId}`);
+  };
   
   return (
     <div 
-      className="bg-gradient-pill-card backdrop-blur-sm rounded-lg p-6 border border-border/50 transition-all duration-300 hover:scale-105 hover:shadow-card animate-fade-in"
+      className="bg-gradient-pill-card backdrop-blur-sm rounded-lg p-6 border border-border/50 transition-all duration-300 hover:scale-105 hover:shadow-card animate-fade-in cursor-pointer"
       style={{ animationDelay: `${index * 100}ms` }}
+      onClick={handleClick}
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
