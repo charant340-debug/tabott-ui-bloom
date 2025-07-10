@@ -44,16 +44,16 @@ const Index = () => {
       {/* Main Content */}
       <main className="pt-20">
         {/* Top Section - Fixed Height Chart Area */}
-        <section className="h-96 px-6 py-6 border-b border-border">
+        <section className="h-96 px-6 py-6 bg-background border-b border-border relative z-20">
           <div className="container mx-auto h-full">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
               {/* Chart - 3/4 width */}
-              <div className="lg:col-span-3">
+              <div className="lg:col-span-3 relative z-10">
                 <PillChart />
               </div>
               
               {/* Stats - 1/4 width */}
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 relative z-10">
                 <TodayStats />
               </div>
             </div>
@@ -61,7 +61,7 @@ const Index = () => {
         </section>
 
         {/* Bottom Section - Pill Cards */}
-        <section className="px-6 py-6">
+        <section className="px-6 py-6 relative z-10 bg-background">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {pillsData.map((pill, index) => (
