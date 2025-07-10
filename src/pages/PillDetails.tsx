@@ -201,10 +201,14 @@ const PillDetails = () => {
               </div>
               <div className="text-right">
                 <div className="text-sm text-muted-foreground mb-1">Next Intake</div>
-                <div className="text-lg font-semibold text-primary mb-2">{pillData.nextIntake}</div>
-                <div className="text-sm text-muted-foreground">
-                  Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken}</span>
-                </div>
+                <div className="text-lg font-semibold text-primary">{pillData.nextIntake}</div>
+              </div>
+            </div>
+
+            {/* Last Taken positioned at bottom right */}
+            <div className="flex justify-end mb-6">
+              <div className="text-sm text-muted-foreground">
+                Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken}</span>
               </div>
             </div>
 
