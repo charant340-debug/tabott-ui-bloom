@@ -44,7 +44,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="pt-20">
         {/* Top Section - Fixed Height Chart Area */}
-        <section className="h-96 px-6 py-6 bg-background border-b border-border relative z-20 mb-20">
+        <section className="h-96 px-6 py-6 bg-background border-b border-border relative z-20 mb-32">
           <div className="container mx-auto h-full">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
               {/* Chart - 3/4 width */}
