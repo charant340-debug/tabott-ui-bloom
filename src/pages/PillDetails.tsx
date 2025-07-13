@@ -26,6 +26,12 @@ interface PillData {
   dose2_time?: string;
   dose3_time?: string;
 }
+
+interface TodayTracking {
+  taken: number;
+  to_be_taken: number;
+  skipped: number;
+}
 // Generate real chart data for the past 7 days
 const generateChartData = (scheduledDoses: number, trackingData: any[] = []): PillChartData[] => {
   const today = new Date();
@@ -56,6 +62,7 @@ const PillDetails = () => {
   const [dynamicSchedule, setDynamicSchedule] = useState(true);
   const [pillData, setPillData] = useState<PillData | null>(null);
   const [trackingData, setTrackingData] = useState<any[]>([]);
+  const [todayTracking, setTodayTracking] = useState<TodayTracking | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Load tracking data for the past week
@@ -81,6 +88,30 @@ const PillDetails = () => {
     } catch (error) {
       console.error('Error:', error);
       return [];
+    }
+  };
+
+  // Load today's tracking data
+  const loadTodayTracking = async (pillId: string) => {
+    try {
+      const today = format(new Date(), 'yyyy-MM-dd');
+
+      const { data: tracking, error } = await supabase
+        .from('tracking')
+        .select('taken, to_be_taken, skipped')
+        .eq('id', pillId)
+        .eq('date', today)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error loading today tracking data:', error);
+        return null;
+      }
+
+      return tracking;
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
     }
   };
 
@@ -162,6 +193,10 @@ const PillDetails = () => {
         // Load tracking data for this pill
         const tracking = await loadTrackingData(pill.id);
         setTrackingData(tracking);
+
+        // Load today's tracking data
+        const todayData = await loadTodayTracking(pill.id);
+        setTodayTracking(todayData);
       } catch (error) {
         console.error('Error:', error);
         toast({
@@ -289,15 +324,21 @@ const PillDetails = () => {
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
                         <span className="text-foreground/80 font-medium">Taken</span>
-                        <span className="text-success font-semibold">2</span>
+                        <span className="text-success font-semibold">
+                          {todayTracking ? todayTracking.taken : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-foreground/80 font-medium">To Take</span>
-                        <span className="text-primary font-semibold">1</span>
+                        <span className="text-primary font-semibold">
+                          {todayTracking ? todayTracking.to_be_taken : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-foreground/80 font-medium">Skipped</span>
-                        <span className="text-foreground/60 font-semibold">0</span>
+                        <span className="text-foreground/60 font-semibold">
+                          {todayTracking ? todayTracking.skipped : 'N/A'}
+                        </span>
                       </div>
                     </div>
                   </div>
