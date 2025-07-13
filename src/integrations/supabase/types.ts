@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      pills: {
+        Row: {
+          created_at: string
+          dose1_time: string | null
+          dose2_time: string | null
+          dose3_time: string | null
+          id: string
+          interval_days: number
+          last_taken_at: string | null
+          name: string
+          pills_count: number | null
+          snooze_duration: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dose1_time?: string | null
+          dose2_time?: string | null
+          dose3_time?: string | null
+          id?: string
+          interval_days?: number
+          last_taken_at?: string | null
+          name: string
+          pills_count?: number | null
+          snooze_duration?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dose1_time?: string | null
+          dose2_time?: string | null
+          dose3_time?: string | null
+          id?: string
+          interval_days?: number
+          last_taken_at?: string | null
+          name?: string
+          pills_count?: number | null
+          snooze_duration?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null

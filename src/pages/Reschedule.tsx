@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Plus, Pill, Timer, Calendar, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,10 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Reschedule = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   // Form state
   const [interval, setInterval] = useState("0");
@@ -18,20 +21,122 @@ const Reschedule = () => {
   const [dose3Time, setDose3Time] = useState("");
   const [pillsToAdd, setPillsToAdd] = useState("");
   const [snoozeTime, setSnoozeTime] = useState("30 mins");
-  const [pillName, setPillName] = useState("Vitamin D3");
-  const lastTaken = "10 Jul 2025 – 14:30";
+  const [pillName, setPillName] = useState("");
+  const [lastTaken, setLastTaken] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving reschedule data:", {
-      pillName,
-      interval,
-      doses: [dose1Time, dose2Time, dose3Time].filter(Boolean),
-      pillsToAdd,
-      snoozeTime
-    });
-    navigate(`/pill/${id}`);
+  // Load pill data on component mount
+  useEffect(() => {
+    const loadPillData = async () => {
+      if (!id) return;
+      
+      try {
+        const { data: pill, error } = await supabase
+          .from('pills')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error('Error loading pill:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load pill data",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (pill) {
+          setPillName(pill.name);
+          setInterval(pill.interval_days.toString());
+          setDose1Time(pill.dose1_time || "08:00");
+          setDose2Time(pill.dose2_time || "");
+          setDose3Time(pill.dose3_time || "");
+          setPillsToAdd(pill.pills_count?.toString() || "");
+          setSnoozeTime(pill.snooze_duration || "30 mins");
+          
+          // Format last taken time
+          if (pill.last_taken_at) {
+            const date = new Date(pill.last_taken_at);
+            const formatted = date.toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }) + ' – ' + date.toLocaleTimeString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            setLastTaken(formatted);
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load pill data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPillData();
+  }, [id, toast]);
+
+  const handleSave = async () => {
+    if (!id) return;
+    
+    try {
+      const updateData = {
+        name: pillName,
+        interval_days: parseInt(interval),
+        dose1_time: dose1Time || null,
+        dose2_time: dose2Time || null,
+        dose3_time: dose3Time || null,
+        pills_count: pillsToAdd ? parseInt(pillsToAdd) : 0,
+        snooze_duration: snoozeTime,
+      };
+
+      const { error } = await supabase
+        .from('pills')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating pill:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save changes",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Pill updated successfully",
+      });
+      
+      navigate(`/pill/${id}`);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save changes",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/95 flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/95">
