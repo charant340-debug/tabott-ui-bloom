@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import PillDetails from "./pages/PillDetails";
 import Reschedule from "./pages/Reschedule";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,11 @@ const App = () => (
             <Route path="/pill/:id/reschedule" element={
               <ProtectedRoute>
                 <Reschedule />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

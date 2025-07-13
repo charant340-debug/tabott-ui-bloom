@@ -63,9 +63,11 @@ const Index = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem className="cursor-pointer">
-                    <User className="h-4 w-4 mr-2" />
-                    Profile
+                  <DropdownMenuItem className="cursor-pointer" asChild>
+                    <Link to="/profile" className="flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <Settings className="h-4 w-4 mr-2" />
