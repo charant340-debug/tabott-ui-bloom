@@ -28,14 +28,22 @@ const Reschedule = () => {
   // Load pill data on component mount
   useEffect(() => {
     const loadPillData = async () => {
-      if (!id) return;
+      if (!id) {
+        toast({
+          title: "Error",
+          description: "No pill ID provided",
+          variant: "destructive",
+        });
+        navigate('/');
+        return;
+      }
       
       try {
         const { data: pill, error } = await supabase
           .from('pills')
           .select('*')
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error loading pill:', error);
@@ -44,31 +52,41 @@ const Reschedule = () => {
             description: "Failed to load pill data",
             variant: "destructive",
           });
+          navigate('/');
           return;
         }
 
-        if (pill) {
-          setPillName(pill.name);
-          setInterval(pill.interval_days.toString());
-          setDose1Time(pill.dose1_time || "08:00");
-          setDose2Time(pill.dose2_time || "");
-          setDose3Time(pill.dose3_time || "");
-          setPillsToAdd(pill.pills_count?.toString() || "");
-          setSnoozeTime(pill.snooze_duration || "30 mins");
-          
-          // Format last taken time
-          if (pill.last_taken_at) {
-            const date = new Date(pill.last_taken_at);
-            const formatted = date.toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            }) + ' – ' + date.toLocaleTimeString('en-GB', {
-              hour: '2-digit',
-              minute: '2-digit'
-            });
-            setLastTaken(formatted);
-          }
+        if (!pill) {
+          toast({
+            title: "Error",
+            description: "Pill not found",
+            variant: "destructive",
+          });
+          navigate('/');
+          return;
+        }
+
+        // Process pill data
+        setPillName(pill.name);
+        setInterval(pill.interval_days.toString());
+        setDose1Time(pill.dose1_time || "08:00");
+        setDose2Time(pill.dose2_time || "");
+        setDose3Time(pill.dose3_time || "");
+        setPillsToAdd(pill.pills_count?.toString() || "");
+        setSnoozeTime(pill.snooze_duration || "30 mins");
+        
+        // Format last taken time
+        if (pill.last_taken_at) {
+          const date = new Date(pill.last_taken_at);
+          const formatted = date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) + ' – ' + date.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          setLastTaken(formatted);
         }
       } catch (error) {
         console.error('Error:', error);

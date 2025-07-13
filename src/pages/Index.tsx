@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Pill, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,30 +15,80 @@ import TodayStats from '../components/TodayStats';
 import PillCard from '../components/PillCard';
 
 interface PillData {
-  id: number;
+  id: string;
   name: string;
   pillsLeft: number;
   lastTaken?: string;
   nextIntake: string;
 }
 
-const pillsData: PillData[] = [
-  { id: 1, name: 'Vitamin D3', pillsLeft: 28, lastTaken: '8:00 AM', nextIntake: '8:00 AM' },
-  { id: 2, name: 'Omega-3', pillsLeft: 15, lastTaken: '12:30 PM', nextIntake: '12:30 PM' },
-  { id: 3, name: 'Magnesium', pillsLeft: 4, lastTaken: '9:00 PM', nextIntake: '9:00 PM' },
-  { id: 4, name: 'B-Complex', pillsLeft: 22, lastTaken: '8:00 AM', nextIntake: 'Tomorrow 8:00 AM' },
-  { id: 5, name: 'Calcium', pillsLeft: 18, lastTaken: '7:00 PM', nextIntake: '7:00 PM' },
-  { id: 6, name: 'Iron', pillsLeft: 2, lastTaken: '1:00 PM', nextIntake: 'Tomorrow 1:00 PM' },
-  { id: 7, name: 'Zinc', pillsLeft: 35, lastTaken: '10:00 AM', nextIntake: 'Tomorrow 10:00 AM' },
-  { id: 8, name: 'Probiotic', pillsLeft: 12, lastTaken: '6:00 AM', nextIntake: 'Tomorrow 6:00 AM' }
-];
-
 const Index = () => {
   const { signOut } = useAuth();
+  const [pillsData, setPillsData] = useState<PillData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPills = async () => {
+      try {
+        const { data: pills, error } = await supabase
+          .from('pills')
+          .select('*')
+          .order('name');
+
+        if (error) {
+          console.error('Error fetching pills:', error);
+          return;
+        }
+
+        if (pills) {
+          const formattedPills: PillData[] = pills.map(pill => {
+            // Format last taken time
+            let lastTaken = '';
+            if (pill.last_taken_at) {
+              const date = new Date(pill.last_taken_at);
+              lastTaken = date.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            }
+
+            // Calculate next intake based on dose times
+            let nextIntake = 'Not scheduled';
+            if (pill.dose1_time) {
+              nextIntake = pill.dose1_time;
+            }
+
+            return {
+              id: pill.id,
+              name: pill.name,
+              pillsLeft: pill.pills_count || 0,
+              lastTaken,
+              nextIntake
+            };
+          });
+          setPillsData(formattedPills);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPills();
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading pills...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

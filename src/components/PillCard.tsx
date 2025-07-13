@@ -3,7 +3,7 @@ import { Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface PillCardProps {
-  pillId: number;
+  pillId: string;
   pillName: string;
   pillsLeft: number;
   lastTaken?: string;
