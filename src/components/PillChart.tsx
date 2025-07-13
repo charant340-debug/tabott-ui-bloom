@@ -1,48 +1,97 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { format, startOfWeek, addDays } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+
 interface ChartData {
   day: string;
   date: string;
   pillsTaken: number;
   totalScheduled: number;
+  isToday: boolean;
 }
-const chartData: ChartData[] = [{
-  day: 'Mon',
-  date: '15',
-  pillsTaken: 6,
-  totalScheduled: 8
-}, {
-  day: 'Tue',
-  date: '16',
-  pillsTaken: 4,
-  totalScheduled: 8
-}, {
-  day: 'Wed',
-  date: '17',
-  pillsTaken: 8,
-  totalScheduled: 8
-}, {
-  day: 'Thu',
-  date: '18',
-  pillsTaken: 5,
-  totalScheduled: 8
-}, {
-  day: 'Fri',
-  date: '19',
-  pillsTaken: 7,
-  totalScheduled: 8
-}, {
-  day: 'Sat',
-  date: '20',
-  pillsTaken: 3,
-  totalScheduled: 6
-}, {
-  day: 'Sun',
-  date: '21',
-  pillsTaken: 6,
-  totalScheduled: 8
-}];
 const PillChart: React.FC = () => {
-  const maxPills = Math.max(...chartData.map(d => d.pillsTaken));
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Generate chart data for the past 7 days
+  const generateChartData = async (): Promise<ChartData[]> => {
+    try {
+      const today = new Date();
+      const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+      
+      // Get all user's pills to calculate total scheduled doses
+      const { data: pills, error: pillsError } = await supabase
+        .from('pills')
+        .select('dose1_time, dose2_time, dose3_time');
+
+      if (pillsError) {
+        console.error('Error fetching pills:', pillsError);
+        return [];
+      }
+
+      // Calculate total scheduled doses per day (sum of all non-null dose times)
+      const totalScheduledPerDay = pills?.reduce((total, pill) => {
+        let doses = 0;
+        if (pill.dose1_time) doses++;
+        if (pill.dose2_time) doses++;
+        if (pill.dose3_time) doses++;
+        return total + doses;
+      }, 0) || 0;
+
+      const chartDataPromises = Array.from({ length: 7 }, async (_, index) => {
+        const date = addDays(startOfCurrentWeek, index);
+        const dateStr = format(date, 'yyyy-MM-dd');
+        
+        // Get tracking data for this date
+        const { data: trackingData, error: trackingError } = await supabase
+          .from('tracking')
+          .select('taken')
+          .eq('date', dateStr);
+
+        if (trackingError) {
+          console.error('Error fetching tracking data:', trackingError);
+        }
+
+        // Sum all taken pills for this date
+        const totalTaken = trackingData?.reduce((sum, record) => sum + (record.taken || 0), 0) || 0;
+
+        return {
+          day: format(date, 'EEE'),
+          date: format(date, 'd'),
+          pillsTaken: totalTaken,
+          totalScheduled: totalScheduledPerDay,
+          isToday: format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+        };
+      });
+
+      return await Promise.all(chartDataPromises);
+    } catch (error) {
+      console.error('Error generating chart data:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const loadChartData = async () => {
+      setLoading(true);
+      const data = await generateChartData();
+      setChartData(data);
+      setLoading(false);
+    };
+
+    loadChartData();
+  }, []);
+
+  const maxPills = Math.max(...chartData.map(d => d.pillsTaken), 1);
+
+  if (loading) {
+    return (
+      <div className="bg-card rounded-lg p-6 h-full border border-border flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   return <div className="bg-card rounded-lg p-6 h-full border border-border flex flex-col">
       
       
@@ -51,13 +100,19 @@ const PillChart: React.FC = () => {
         const height = data.pillsTaken / maxPills * 100;
         return <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
               {/* Pill count - always visible */}
-              <div className="text-sm font-bold text-primary mb-2 min-h-[20px] flex items-end">
+              <div className={`text-sm font-bold mb-2 min-h-[20px] flex items-end ${
+                data.isToday ? 'text-accent' : 'text-primary'
+              }`}>
                 {data.pillsTaken}/{data.totalScheduled}
               </div>
               
               {/* Bar Container */}
               <div className="w-full flex flex-col items-center justify-end h-40 relative">
-                <div className="w-full bg-gradient-to-t from-primary/60 to-primary/90 rounded-t-lg transition-all duration-700 hover:from-primary/80 hover:to-primary group-hover:shadow-glow relative overflow-hidden" style={{
+                <div className={`w-full rounded-t-lg transition-all duration-700 hover:from-primary/80 hover:to-primary group-hover:shadow-glow relative overflow-hidden ${
+                  data.isToday 
+                    ? 'bg-gradient-to-t from-accent/60 to-accent/90' 
+                    : 'bg-gradient-to-t from-primary/60 to-primary/90'
+                }`} style={{
               height: `${Math.max(height, 8)}%`,
               // Minimum 8% height for visibility
               animationDelay: `${index * 150}ms`
@@ -69,8 +124,14 @@ const PillChart: React.FC = () => {
               
               {/* Day and date labels */}
               <div className="text-center mt-3 space-y-1">
-                <div className="text-sm font-semibold text-foreground">{data.day}</div>
-                <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded">
+                <div className={`text-sm font-semibold ${
+                  data.isToday ? 'text-accent' : 'text-foreground'
+                }`}>{data.day}</div>
+                <div className={`text-xs px-2 py-1 rounded ${
+                  data.isToday 
+                    ? 'text-accent bg-accent/10' 
+                    : 'text-muted-foreground bg-muted/30'
+                }`}>
                   {data.date}
                 </div>
               </div>
