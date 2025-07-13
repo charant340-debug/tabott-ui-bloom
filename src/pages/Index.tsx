@@ -1,7 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, LogOut } from 'lucide-react';
+import { Pill, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import PillChart from '../components/PillChart';
 import TodayStats from '../components/TodayStats';
 import PillCard from '../components/PillCard';
@@ -46,15 +53,35 @@ const Index = () => {
             </h1>
             <span className="text-sm text-muted-foreground ml-2">Smart Pill Reminder</span>
             
-            {/* Logout Button */}
+            {/* User Menu */}
             <div className="ml-auto">
-              <button 
-                onClick={handleSignOut}
-                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 text-destructive px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 border border-destructive/20"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 bg-muted hover:bg-muted/80 text-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 border border-border">
+                    <User className="h-4 w-4" />
+                    <span>Menu</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
