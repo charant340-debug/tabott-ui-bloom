@@ -104,7 +104,6 @@ export type Database = {
           date: string
           first_intake: string | null
           id: string
-          pill_id: string
           second_intake: string | null
           skipped: number
           taken: number
@@ -117,8 +116,7 @@ export type Database = {
           created_at?: string
           date: string
           first_intake?: string | null
-          id?: string
-          pill_id: string
+          id: string
           second_intake?: string | null
           skipped?: number
           taken?: number
@@ -132,7 +130,6 @@ export type Database = {
           date?: string
           first_intake?: string | null
           id?: string
-          pill_id?: string
           second_intake?: string | null
           skipped?: number
           taken?: number
@@ -143,8 +140,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_tracking_pill_id"
-            columns: ["pill_id"]
+            foreignKeyName: "fk_tracking_id"
+            columns: ["id"]
             isOneToOne: false
             referencedRelation: "pills"
             referencedColumns: ["id"]
