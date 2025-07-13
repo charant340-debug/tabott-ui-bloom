@@ -1,72 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Pill } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
 interface PillChartData {
   day: string;
   date: string;
   pillsTaken: number;
   totalScheduled: number;
 }
-const pillDetailsData = {
-  1: {
-    name: 'Vitamin D3',
-    pillsLeft: 28,
-    lastTaken: '8:00 AM',
-    nextIntake: '8:00 AM',
-    scheduledDoses: 1
-  },
-  2: {
-    name: 'Omega-3',
-    pillsLeft: 15,
-    lastTaken: '12:30 PM',
-    nextIntake: '12:30 PM',
-    scheduledDoses: 2
-  },
-  3: {
-    name: 'Magnesium',
-    pillsLeft: 4,
-    lastTaken: '9:00 PM',
-    nextIntake: '9:00 PM',
-    scheduledDoses: 1
-  },
-  4: {
-    name: 'B-Complex',
-    pillsLeft: 22,
-    lastTaken: '8:00 AM',
-    nextIntake: 'Tomorrow 8:00 AM',
-    scheduledDoses: 1
-  },
-  5: {
-    name: 'Calcium',
-    pillsLeft: 18,
-    lastTaken: '7:00 PM',
-    nextIntake: '7:00 PM',
-    scheduledDoses: 3
-  },
-  6: {
-    name: 'Iron',
-    pillsLeft: 2,
-    lastTaken: '1:00 PM',
-    nextIntake: 'Tomorrow 1:00 PM',
-    scheduledDoses: 1
-  },
-  7: {
-    name: 'Zinc',
-    pillsLeft: 35,
-    lastTaken: '10:00 AM',
-    nextIntake: 'Tomorrow 10:00 AM',
-    scheduledDoses: 1
-  },
-  8: {
-    name: 'Probiotic',
-    pillsLeft: 12,
-    lastTaken: '6:00 AM',
-    nextIntake: 'Tomorrow 6:00 AM',
-    scheduledDoses: 2
-  }
-};
 
+interface PillData {
+  id: string;
+  name: string;
+  pillsLeft: number;
+  lastTaken?: string;
+  nextIntake: string;
+  scheduledDoses: number;
+  dose1_time?: string;
+  dose2_time?: string;
+  dose3_time?: string;
+}
 // Generate dummy chart data for individual pill
 const generateChartData = (scheduledDoses: number): PillChartData[] => [{
   day: 'Mon',
@@ -104,31 +60,135 @@ const generateChartData = (scheduledDoses: number): PillChartData[] => [{
   pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
   totalScheduled: scheduledDoses
 }];
+
 const PillDetails = () => {
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
+  const { id } = useParams<{ id: string; }>();
   const navigate = useNavigate();
-  const [dynamicSchedule, setDynamicSchedule] = React.useState(true);
-  const pillId = parseInt(id || '1');
-  const pillData = pillDetailsData[pillId as keyof typeof pillDetailsData];
-  
-  // Scroll to top when component mounts
+  const { toast } = useToast();
+  const [dynamicSchedule, setDynamicSchedule] = useState(true);
+  const [pillData, setPillData] = useState<PillData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load pill data on component mount
   useEffect(() => {
+    const loadPillData = async () => {
+      if (!id) {
+        toast({
+          title: "Error",
+          description: "No pill ID provided",
+          variant: "destructive",
+        });
+        navigate('/');
+        return;
+      }
+      
+      try {
+        const { data: pill, error } = await supabase
+          .from('pills')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading pill:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load pill data",
+            variant: "destructive",
+          });
+          navigate('/');
+          return;
+        }
+
+        if (!pill) {
+          toast({
+            title: "Error", 
+            description: "Pill not found",
+            variant: "destructive",
+          });
+          navigate('/');
+          return;
+        }
+
+        // Calculate scheduled doses
+        let scheduledDoses = 0;
+        if (pill.dose1_time) scheduledDoses++;
+        if (pill.dose2_time) scheduledDoses++;
+        if (pill.dose3_time) scheduledDoses++;
+
+        // Format last taken time
+        let lastTaken = '';
+        if (pill.last_taken_at) {
+          const date = new Date(pill.last_taken_at);
+          lastTaken = date.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
+
+        // Calculate next intake
+        let nextIntake = 'Not scheduled';
+        if (pill.dose1_time) {
+          nextIntake = pill.dose1_time;
+        }
+
+        setPillData({
+          id: pill.id,
+          name: pill.name,
+          pillsLeft: pill.pills_count || 0,
+          lastTaken,
+          nextIntake,
+          scheduledDoses,
+          dose1_time: pill.dose1_time,
+          dose2_time: pill.dose2_time,
+          dose3_time: pill.dose3_time,
+        });
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load pill data",
+          variant: "destructive",
+        });
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPillData();
     window.scrollTo(0, 0);
-  }, []);
-  
-  if (!pillData) {
-    return <div>Pill not found</div>;
+  }, [id, toast, navigate]);
+
+  const generateScheduleTimes = () => {
+    if (!pillData) return [];
+    
+    const times = [];
+    if (pillData.dose1_time) times.push(pillData.dose1_time);
+    if (pillData.dose2_time) times.push(pillData.dose2_time);
+    if (pillData.dose3_time) times.push(pillData.dose3_time);
+    
+    return times;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    );
   }
+
+  if (!pillData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Pill not found</div>
+      </div>
+    );
+  }
+
   const chartData = generateChartData(pillData.scheduledDoses);
   const maxPills = Math.max(...chartData.map(d => d.pillsTaken));
-  const generateScheduleTimes = (doses: number) => {
-    const times = ['8:00 AM', '1:00 PM', '8:00 PM'];
-    return times.slice(0, doses);
-  };
   return <div className="min-h-screen bg-background">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -241,7 +301,7 @@ const PillDetails = () => {
             <div className="mt-6 pt-6 border-t border-border/20">
               <h3 className="text-lg font-semibold text-foreground mb-4">Schedule</h3>
               <div className="space-y-3">
-                {generateScheduleTimes(3).map((time, index) => (
+                {generateScheduleTimes().map((time, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-card/20 rounded-lg border border-border/10">
                     <div>
                       <div className="font-medium text-foreground">
