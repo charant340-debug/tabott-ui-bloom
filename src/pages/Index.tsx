@@ -57,9 +57,8 @@ const Index = () => {
             <div className="ml-auto">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 bg-muted hover:bg-muted/80 text-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 border border-border">
+                  <button className="flex items-center gap-1 bg-muted hover:bg-muted/80 text-foreground px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 border border-border">
                     <User className="h-4 w-4" />
-                    <span>Menu</span>
                     <ChevronDown className="h-3 w-3" />
                   </button>
                 </DropdownMenuTrigger>
