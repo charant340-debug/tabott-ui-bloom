@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, Plus, Pill, Timer, Calendar } from "lucide-react";
+import { ArrowLeft, Clock, Plus, Pill, Timer, Calendar, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,14 +18,13 @@ const Reschedule = () => {
   const [dose3Time, setDose3Time] = useState("");
   const [pillsToAdd, setPillsToAdd] = useState("");
   const [snoozeTime, setSnoozeTime] = useState("30 mins");
-
-  // Mock data for display
-  const pillName = "Vitamin D3";
+  const [pillName, setPillName] = useState("Vitamin D3");
   const lastTaken = "10 Jul 2025 – 14:30";
 
   const handleSave = () => {
     // Handle save logic here
     console.log("Saving reschedule data:", {
+      pillName,
       interval,
       doses: [dose1Time, dose2Time, dose3Time].filter(Boolean),
       pillsToAdd,
@@ -54,6 +53,29 @@ const Reschedule = () => {
         </div>
 
         <div className="space-y-6">
+          {/* Rename Pill */}
+          <Card className="bg-card/50 border border-border/30 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Edit3 className="h-5 w-5 text-primary" />
+                Rename Pill
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="pillName" className="text-sm font-medium">Pill Name</Label>
+                <Input
+                  id="pillName"
+                  type="text"
+                  value={pillName}
+                  onChange={(e) => setPillName(e.target.value)}
+                  placeholder="Enter pill name"
+                  className="bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/20"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Interval Selector */}
           <Card className="bg-card/50 border border-border/30 backdrop-blur-sm">
             <CardHeader className="pb-3">
