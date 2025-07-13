@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PillDetails from "./pages/PillDetails";
 import Reschedule from "./pages/Reschedule";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,6 +19,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/pill/:id" element={<PillDetails />} />
           <Route path="/pill/:id/reschedule" element={<Reschedule />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

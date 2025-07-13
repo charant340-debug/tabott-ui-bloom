@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pill } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Pill, User } from 'lucide-react';
 import PillChart from '../components/PillChart';
 import TodayStats from '../components/TodayStats';
 import PillCard from '../components/PillCard';
@@ -37,6 +38,17 @@ const Index = () => {
               TABOTT
             </h1>
             <span className="text-sm text-muted-foreground ml-2">Smart Pill Reminder</span>
+            
+            {/* Login Button */}
+            <div className="ml-auto">
+              <Link 
+                to="/auth" 
+                className="flex items-center gap-2 bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 shadow-elegant"
+              >
+                <User className="h-4 w-4" />
+                Login
+              </Link>
+            </div>
           </div>
         </div>
       </header>
