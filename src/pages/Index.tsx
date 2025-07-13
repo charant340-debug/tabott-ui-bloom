@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, User } from 'lucide-react';
+import { Pill, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import PillChart from '../components/PillChart';
 import TodayStats from '../components/TodayStats';
 import PillCard from '../components/PillCard';
@@ -25,6 +26,12 @@ const pillsData: PillData[] = [
 ];
 
 const Index = () => {
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Fixed Top Navigation */}
@@ -39,15 +46,15 @@ const Index = () => {
             </h1>
             <span className="text-sm text-muted-foreground ml-2">Smart Pill Reminder</span>
             
-            {/* Login Button */}
+            {/* Logout Button */}
             <div className="ml-auto">
-              <Link 
-                to="/auth" 
-                className="flex items-center gap-2 bg-gradient-primary hover:bg-gradient-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 shadow-elegant"
+              <button 
+                onClick={handleSignOut}
+                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 text-destructive px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 border border-destructive/20"
               >
-                <User className="h-4 w-4" />
-                Login
-              </Link>
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </div>
           </div>
         </div>
