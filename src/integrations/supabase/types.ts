@@ -98,6 +98,59 @@ export type Database = {
         }
         Relationships: []
       }
+      tracking: {
+        Row: {
+          created_at: string
+          date: string
+          first_intake: string | null
+          id: string
+          pill_id: string
+          second_intake: string | null
+          skipped: number
+          taken: number
+          third_intake: string | null
+          to_be_taken: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          first_intake?: string | null
+          id?: string
+          pill_id: string
+          second_intake?: string | null
+          skipped?: number
+          taken?: number
+          third_intake?: string | null
+          to_be_taken?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          first_intake?: string | null
+          id?: string
+          pill_id?: string
+          second_intake?: string | null
+          skipped?: number
+          taken?: number
+          third_intake?: string | null
+          to_be_taken?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_tracking_pill_id"
+            columns: ["pill_id"]
+            isOneToOne: false
+            referencedRelation: "pills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
