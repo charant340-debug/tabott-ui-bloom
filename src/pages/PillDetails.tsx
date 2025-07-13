@@ -4,12 +4,15 @@ import { ArrowLeft, Pill } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { format, startOfWeek, addDays, isToday } from 'date-fns';
 
 interface PillChartData {
   day: string;
   date: string;
+  fullDate: string;
   pillsTaken: number;
   totalScheduled: number;
+  isToday: boolean;
 }
 
 interface PillData {
@@ -23,43 +26,28 @@ interface PillData {
   dose2_time?: string;
   dose3_time?: string;
 }
-// Generate dummy chart data for individual pill
-const generateChartData = (scheduledDoses: number): PillChartData[] => [{
-  day: 'Mon',
-  date: '15',
-  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
-  totalScheduled: scheduledDoses
-}, {
-  day: 'Tue',
-  date: '16',
-  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
-  totalScheduled: scheduledDoses
-}, {
-  day: 'Wed',
-  date: '17',
-  pillsTaken: scheduledDoses,
-  totalScheduled: scheduledDoses
-}, {
-  day: 'Thu',
-  date: '18',
-  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
-  totalScheduled: scheduledDoses
-}, {
-  day: 'Fri',
-  date: '19',
-  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
-  totalScheduled: scheduledDoses
-}, {
-  day: 'Sat',
-  date: '20',
-  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
-  totalScheduled: scheduledDoses
-}, {
-  day: 'Sun',
-  date: '21',
-  pillsTaken: Math.floor(Math.random() * scheduledDoses) + 1,
-  totalScheduled: scheduledDoses
-}];
+// Generate real chart data for the past 7 days
+const generateChartData = (scheduledDoses: number, trackingData: any[] = []): PillChartData[] => {
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Start week on Monday
+  
+  return Array.from({ length: 7 }, (_, i) => {
+    const currentDate = addDays(weekStart, i);
+    const dateString = format(currentDate, 'yyyy-MM-dd');
+    
+    // Find tracking data for this date
+    const dayTracking = trackingData.find(t => t.date === dateString);
+    
+    return {
+      day: format(currentDate, 'EEE'), // Mon, Tue, etc.
+      date: format(currentDate, 'd'),  // 1, 2, 3, etc.
+      fullDate: dateString,
+      pillsTaken: dayTracking ? dayTracking.taken : 0,
+      totalScheduled: scheduledDoses,
+      isToday: isToday(currentDate)
+    };
+  });
+};
 
 const PillDetails = () => {
   const { id } = useParams<{ id: string; }>();
@@ -67,7 +55,34 @@ const PillDetails = () => {
   const { toast } = useToast();
   const [dynamicSchedule, setDynamicSchedule] = useState(true);
   const [pillData, setPillData] = useState<PillData | null>(null);
+  const [trackingData, setTrackingData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Load tracking data for the past week
+  const loadTrackingData = async (pillId: string) => {
+    try {
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+      const dates = Array.from({ length: 7 }, (_, i) => 
+        format(addDays(weekStart, i), 'yyyy-MM-dd')
+      );
+
+      const { data: tracking, error } = await supabase
+        .from('tracking')
+        .select('*')
+        .eq('id', pillId) // Note: id column now references pill ID
+        .in('date', dates);
+
+      if (error) {
+        console.error('Error loading tracking data:', error);
+        return [];
+      }
+
+      return tracking || [];
+    } catch (error) {
+      console.error('Error:', error);
+      return [];
+    }
+  };
 
   // Load pill data on component mount
   useEffect(() => {
@@ -143,6 +158,10 @@ const PillDetails = () => {
           dose2_time: pill.dose2_time,
           dose3_time: pill.dose3_time,
         });
+
+        // Load tracking data for this pill
+        const tracking = await loadTrackingData(pill.id);
+        setTrackingData(tracking);
       } catch (error) {
         console.error('Error:', error);
         toast({
@@ -187,8 +206,8 @@ const PillDetails = () => {
     );
   }
 
-  const chartData = generateChartData(pillData.scheduledDoses);
-  const maxPills = Math.max(...chartData.map(d => d.pillsTaken));
+  const chartData = generateChartData(pillData.scheduledDoses, trackingData);
+  const maxPills = Math.max(...chartData.map(d => d.pillsTaken), 1); // Ensure at least 1 for proper scaling
   return <div className="min-h-screen bg-background">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -236,8 +255,8 @@ const PillDetails = () => {
                     {/* Day and date labels */}
                     <div className="text-center mt-3 space-y-1">
                       <div className="text-sm font-semibold text-foreground">{data.day}</div>
-                      <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded">
-                        {data.date} Jul
+                      <div className={`text-xs text-muted-foreground px-2 py-1 rounded ${data.isToday ? 'bg-primary/20 text-primary font-semibold' : 'bg-muted/30'}`}>
+                        {data.date} {format(new Date(data.fullDate), 'MMM')}
                       </div>
                     </div>
                   </div>;
@@ -311,7 +330,7 @@ const PillDetails = () => {
                     </div>
                     <div className="text-right">
                       <div className="font-semibold text-primary">{time}</div>
-                      <div className="text-xs text-muted-foreground">Today, Jul 21</div>
+                      <div className="text-xs text-muted-foreground">Today, {format(new Date(), 'MMM d')}</div>
                     </div>
                   </div>
                 ))}
