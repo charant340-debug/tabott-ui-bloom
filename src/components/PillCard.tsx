@@ -28,10 +28,18 @@ const PillCard: React.FC<PillCardProps> = ({
   // Fetch last taken data from tracking table
   const fetchLastTaken = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLastTakenData(null);
+        return;
+      }
+
       const { data: tracking, error } = await supabase
         .from('tracking')
         .select('third_intake, second_intake, first_intake, date')
         .eq('id', pillId)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1);
 
