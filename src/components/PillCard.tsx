@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PillCardProps {
   pillId: string;
@@ -15,12 +17,64 @@ const PillCard: React.FC<PillCardProps> = ({
   pillId,
   pillName, 
   pillsLeft, 
-  lastTaken, 
   nextIntake, 
   index 
 }) => {
   const navigate = useNavigate();
   const isLowStock = pillsLeft <= 5;
+  const [lastTakenData, setLastTakenData] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch last taken data from tracking table
+  const fetchLastTaken = async () => {
+    try {
+      const { data: tracking, error } = await supabase
+        .from('tracking')
+        .select('third_intake, second_intake, first_intake, date')
+        .eq('id', pillId)
+        .order('date', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('Error fetching last taken data:', error);
+        setLastTakenData(null);
+        return;
+      }
+
+      if (!tracking || tracking.length === 0) {
+        setLastTakenData(null);
+        return;
+      }
+
+      const record = tracking[0];
+      
+      // Check third_intake first, then second_intake, then first_intake
+      let lastIntake = null;
+      if (record.third_intake) {
+        lastIntake = record.third_intake;
+      } else if (record.second_intake) {
+        lastIntake = record.second_intake;
+      } else if (record.first_intake) {
+        lastIntake = record.first_intake;
+      }
+
+      if (lastIntake) {
+        const formattedTime = format(new Date(lastIntake), 'MMM dd, HH:mm');
+        setLastTakenData(formattedTime);
+      } else {
+        setLastTakenData(null);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setLastTakenData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLastTaken();
+  }, [pillId]);
   
   const handleClick = () => {
     navigate(`/pill/${pillId}`);
@@ -37,10 +91,10 @@ const PillCard: React.FC<PillCardProps> = ({
         <h3 className="text-lg font-bold text-foreground truncate pr-2">
           {pillName}
         </h3>
-        {lastTaken && (
+        {!loading && (lastTakenData || lastTakenData === null) && (
           <div className="text-right">
             <div className="text-xs text-muted-foreground">Last Taken</div>
-            <div className="text-sm font-medium text-secondary">{lastTaken}</div>
+            <div className="text-sm font-medium text-secondary">{lastTakenData || 'N/A'}</div>
           </div>
         )}
       </div>
