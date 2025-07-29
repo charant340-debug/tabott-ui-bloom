@@ -66,6 +66,7 @@ export type Database = {
           blood_group: string | null
           contact_no: string | null
           created_at: string
+          device_id: string | null
           email: string | null
           full_name: string | null
           height_cm: number | null
@@ -78,6 +79,7 @@ export type Database = {
           blood_group?: string | null
           contact_no?: string | null
           created_at?: string
+          device_id?: string | null
           email?: string | null
           full_name?: string | null
           height_cm?: number | null
@@ -90,6 +92,7 @@ export type Database = {
           blood_group?: string | null
           contact_no?: string | null
           created_at?: string
+          device_id?: string | null
           email?: string | null
           full_name?: string | null
           height_cm?: number | null
