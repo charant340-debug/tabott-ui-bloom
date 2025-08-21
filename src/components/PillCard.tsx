@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PillCardProps {
@@ -67,7 +68,7 @@ const PillCard: React.FC<PillCardProps> = ({
       }
 
       if (lastIntake) {
-        const formattedTime = format(new Date(lastIntake), 'MMM dd, HH:mm');
+        const formattedTime = formatInTimeZone(new Date(lastIntake), 'Asia/Kolkata', 'MMM dd, HH:mm');
         setLastTakenData(formattedTime);
       } else {
         setLastTakenData(null);

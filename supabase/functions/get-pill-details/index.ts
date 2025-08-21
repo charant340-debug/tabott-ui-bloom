@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { formatInTimeZone, toZonedTime } from 'https://esm.sh/date-fns-tz@3.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -59,10 +60,10 @@ serve(async (req) => {
       console.error('Error fetching tracking data:', trackingError);
     }
 
-    // Calculate next intake time
+    // Calculate next intake time in IST
     const calculateNextIntake = () => {
-      const now = new Date();
-      const currentTime = now.toTimeString().slice(0, 5);
+      const nowIST = toZonedTime(new Date(), 'Asia/Kolkata');
+      const currentTimeIST = formatInTimeZone(nowIST, 'Asia/Kolkata', 'HH:mm');
       
       const doses = [
         pillData.dose1_time,
@@ -71,16 +72,16 @@ serve(async (req) => {
       ].filter(Boolean).sort();
 
       for (const dose of doses) {
-        if (dose && dose > currentTime) {
-          return `Today ${dose}`;
+        if (dose && dose > currentTimeIST) {
+          return `Today ${dose} IST`;
         }
       }
       
       // If no more doses today, return first dose tomorrow
-      return doses.length > 0 ? `Tomorrow ${doses[0]}` : 'No scheduled doses';
+      return doses.length > 0 ? `Tomorrow ${doses[0]} IST` : 'No scheduled doses';
     };
 
-    // Get last taken time
+    // Get last taken time in IST
     const getLastTaken = () => {
       if (!trackingData || trackingData.length === 0) {
         return null;
@@ -90,11 +91,11 @@ serve(async (req) => {
       
       // Check third_intake first, then second_intake, then first_intake
       if (record.third_intake) {
-        return new Date(record.third_intake).toLocaleString();
+        return formatInTimeZone(new Date(record.third_intake), 'Asia/Kolkata', 'MMM dd, yyyy HH:mm zzz');
       } else if (record.second_intake) {
-        return new Date(record.second_intake).toLocaleString();
+        return formatInTimeZone(new Date(record.second_intake), 'Asia/Kolkata', 'MMM dd, yyyy HH:mm zzz');
       } else if (record.first_intake) {
-        return new Date(record.first_intake).toLocaleString();
+        return formatInTimeZone(new Date(record.first_intake), 'Asia/Kolkata', 'MMM dd, yyyy HH:mm zzz');
       }
       
       return null;
