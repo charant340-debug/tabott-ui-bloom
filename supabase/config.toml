@@ -1,1 +1,4 @@
 project_id = "qqcppzrwatagnnwspowm"
+
+[functions.get-pill-details]
+verify_jwt = false

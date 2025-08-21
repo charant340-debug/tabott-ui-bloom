@@ -1,0 +1,132 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get pill ID from URL params or request body
+    const url = new URL(req.url);
+    const pillId = url.searchParams.get('pillId');
+    
+    if (!pillId) {
+      return new Response(
+        JSON.stringify({ error: 'Pill ID is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Fetching details for pill: ${pillId}`);
+
+    // Get pill information
+    const { data: pillData, error: pillError } = await supabase
+      .from('pills')
+      .select('*')
+      .eq('id', pillId)
+      .single();
+
+    if (pillError) {
+      console.error('Error fetching pill:', pillError);
+      return new Response(
+        JSON.stringify({ error: 'Pill not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Get latest tracking data for this pill
+    const { data: trackingData, error: trackingError } = await supabase
+      .from('tracking')
+      .select('*')
+      .eq('id', pillId)
+      .order('date', { ascending: false })
+      .limit(1);
+
+    if (trackingError) {
+      console.error('Error fetching tracking data:', trackingError);
+    }
+
+    // Calculate next intake time
+    const calculateNextIntake = () => {
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5);
+      
+      const doses = [
+        pillData.dose1_time,
+        pillData.dose2_time, 
+        pillData.dose3_time
+      ].filter(Boolean).sort();
+
+      for (const dose of doses) {
+        if (dose && dose > currentTime) {
+          return `Today ${dose}`;
+        }
+      }
+      
+      // If no more doses today, return first dose tomorrow
+      return doses.length > 0 ? `Tomorrow ${doses[0]}` : 'No scheduled doses';
+    };
+
+    // Get last taken time
+    const getLastTaken = () => {
+      if (!trackingData || trackingData.length === 0) {
+        return null;
+      }
+
+      const record = trackingData[0];
+      
+      // Check third_intake first, then second_intake, then first_intake
+      if (record.third_intake) {
+        return new Date(record.third_intake).toLocaleString();
+      } else if (record.second_intake) {
+        return new Date(record.second_intake).toLocaleString();
+      } else if (record.first_intake) {
+        return new Date(record.first_intake).toLocaleString();
+      }
+      
+      return null;
+    };
+
+    const response = {
+      pillId: pillData.id,
+      pillName: pillData.name,
+      pillCount: pillData.pills_count || 0,
+      nextIntake: calculateNextIntake(),
+      lastTaken: getLastTaken(),
+      isLowStock: (pillData.pills_count || 0) <= 5,
+      doseTimes: {
+        dose1: pillData.dose1_time,
+        dose2: pillData.dose2_time,
+        dose3: pillData.dose3_time
+      },
+      intervalDays: pillData.interval_days,
+      snoozeDuration: pillData.snooze_duration
+    };
+
+    console.log('Pill details response:', response);
+
+    return new Response(JSON.stringify(response), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error in get-pill-details function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
