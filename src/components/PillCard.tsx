@@ -26,7 +26,7 @@ const PillCard: React.FC<PillCardProps> = ({
   const [lastTakenData, setLastTakenData] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch last taken data from tracking table
+  // Fetch last taken data from pills table (last_taken_at column)
   const fetchLastTaken = async () => {
     try {
       // Get current user
@@ -36,13 +36,12 @@ const PillCard: React.FC<PillCardProps> = ({
         return;
       }
 
-      const { data: tracking, error } = await supabase
-        .from('tracking')
-        .select('third_intake, second_intake, first_intake, date')
+      const { data: pill, error } = await supabase
+        .from('pills')
+        .select('last_taken_at')
         .eq('id', pillId)
         .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(1);
+        .single();
 
       if (error) {
         console.error('Error fetching last taken data:', error);
@@ -50,29 +49,13 @@ const PillCard: React.FC<PillCardProps> = ({
         return;
       }
 
-      if (!tracking || tracking.length === 0) {
+      if (!pill || !pill.last_taken_at) {
         setLastTakenData(null);
         return;
       }
 
-      const record = tracking[0];
-      
-      // Check third_intake first, then second_intake, then first_intake
-      let lastIntake = null;
-      if (record.third_intake) {
-        lastIntake = record.third_intake;
-      } else if (record.second_intake) {
-        lastIntake = record.second_intake;
-      } else if (record.first_intake) {
-        lastIntake = record.first_intake;
-      }
-
-      if (lastIntake) {
-        const formattedTime = formatInTimeZone(new Date(lastIntake), 'Asia/Kolkata', 'MMM dd, HH:mm');
-        setLastTakenData(formattedTime);
-      } else {
-        setLastTakenData(null);
-      }
+      const formattedTime = formatInTimeZone(new Date(pill.last_taken_at), 'Asia/Kolkata', 'MMM dd, HH:mm');
+      setLastTakenData(formattedTime);
     } catch (error) {
       console.error('Error:', error);
       setLastTakenData(null);
