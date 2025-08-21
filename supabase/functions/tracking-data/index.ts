@@ -33,7 +33,20 @@ Deno.serve(async (req) => {
       )
     }
 
-    const body = await req.json()
+    let body;
+    try {
+      body = await req.json()
+    } catch (parseError) {
+      console.error('JSON parsing error:', parseError)
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+    
     console.log('Received tracking data:', body)
 
     // Validate required fields
