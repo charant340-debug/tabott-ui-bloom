@@ -119,8 +119,45 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Prepare tracking data for all pills
-    const trackingDataArray = pillIds.map(pillId => {
+    // Check which tracking records already exist for this date
+    const { data: existingRecords, error: existingError } = await supabase
+      .from('tracking')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('date', date)
+      .in('id', pillIds)
+
+    if (existingError) {
+      console.error('Error checking existing records:', existingError)
+      return new Response(
+        JSON.stringify({ error: 'Error checking existing tracking records' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    const existingPillIds = existingRecords?.map(r => r.id) || []
+    const newPillIds = pillIds.filter(id => !existingPillIds.includes(id))
+
+    if (newPillIds.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'All tracking records already exist for this date',
+          processed_pills: 0,
+          skipped_pills: pillIds.length
+        }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    // Prepare tracking data only for new pills
+    const trackingDataArray = newPillIds.map(pillId => {
       const pillData = pills[pillId]
       return {
         id: pillId,
@@ -135,13 +172,10 @@ Deno.serve(async (req) => {
       }
     })
 
-    // Upsert all tracking data
+    // Insert only new tracking data
     const { data, error } = await supabase
       .from('tracking')
-      .upsert(trackingDataArray, {
-        onConflict: 'id,user_id,date',
-        ignoreDuplicates: false
-      })
+      .insert(trackingDataArray)
       .select()
 
     if (error) {
@@ -160,9 +194,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Tracking data saved successfully for ${pillIds.length} pills`,
+        message: `Tracking data saved successfully for ${newPillIds.length} pills`,
         data: data,
-        processed_pills: pillIds.length
+        processed_pills: newPillIds.length,
+        skipped_pills: existingPillIds.length
       }),
       { 
         status: 200, 
