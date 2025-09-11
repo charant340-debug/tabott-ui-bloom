@@ -30,10 +30,9 @@ serve(async (req) => {
 
     // Prepare the setup payload
     const setupPayload = {
-      device_id,
+      user_id: device_id,
       ssid,
-      password,
-      timestamp: new Date().toISOString()
+      password
     };
 
     // Create the topic in the format: setup/{device_id}
