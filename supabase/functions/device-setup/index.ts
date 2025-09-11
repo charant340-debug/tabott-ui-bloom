@@ -13,12 +13,12 @@ serve(async (req) => {
   }
 
   try {
-    const { device_id, ssid, password } = await req.json();
+    const { device_id, user_id, ssid, password } = await req.json();
 
     // Validate required fields
-    if (!device_id || !ssid || !password) {
+    if (!device_id || !user_id || !ssid || !password) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: device_id, ssid, password' }),
+        JSON.stringify({ error: 'Missing required fields: device_id, user_id, ssid, password' }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -26,11 +26,11 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Setting up device: ${device_id}`);
+    console.log(`Setting up device: ${device_id} for user: ${user_id}`);
 
     // Prepare the setup payload
     const setupPayload = {
-      user_id: device_id,
+      user_id,
       ssid,
       password
     };

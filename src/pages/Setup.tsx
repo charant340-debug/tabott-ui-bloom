@@ -7,8 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const Setup = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     device_id: '',
@@ -32,6 +34,11 @@ const Setup = () => {
       return;
     }
 
+    if (!user) {
+      toast.error('You must be logged in to setup a device');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -39,6 +46,7 @@ const Setup = () => {
       const { data, error } = await supabase.functions.invoke('device-setup', {
         body: {
           device_id: formData.device_id,
+          user_id: user.id,
           ssid: formData.ssid,
           password: formData.password
         }
