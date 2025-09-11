@@ -10,6 +10,7 @@ import PillDetails from "./pages/PillDetails";
 import Reschedule from "./pages/Reschedule";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Setup from "./pages/Setup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,11 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/setup" element={
+              <ProtectedRoute>
+                <Setup />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -120,9 +120,11 @@ const Index = () => {
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
+                  <DropdownMenuItem className="cursor-pointer" asChild>
+                    <Link to="/setup" className="flex items-center">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Device Setup
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
