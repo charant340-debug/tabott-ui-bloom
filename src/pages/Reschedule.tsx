@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, Plus, Pill, Timer, Calendar, Edit3 } from "lucide-react";
+import { ArrowLeft, Clock, Plus, Pill, Timer, Calendar, Edit3, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ const Reschedule = () => {
   const [pillsToAdd, setPillsToAdd] = useState("");
   const [snoozeTime, setSnoozeTime] = useState("30 mins");
   const [pillName, setPillName] = useState("");
+  const [slotName, setSlotName] = useState("");
   const [lastTaken, setLastTaken] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -68,6 +69,7 @@ const Reschedule = () => {
 
         // Process pill data
         setPillName(pill.name);
+        setSlotName(pill.slot_name || "");
         setInterval(pill.interval_days.toString());
         setDose1Time(pill.dose1_time || "08:00");
         setDose2Time(pill.dose2_time || "");
@@ -109,6 +111,7 @@ const Reschedule = () => {
     try {
       const updateData = {
         name: pillName,
+        slot_name: slotName || null,
         interval_days: parseInt(interval),
         dose1_time: dose1Time || null,
         dose2_time: dose2Time || null,
@@ -196,6 +199,30 @@ const Reschedule = () => {
                   className="bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/20"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Slot Selector */}
+          <Card className="bg-card/50 border border-border/30 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Package className="h-5 w-5 text-primary" />
+                Pill Slot
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select value={slotName} onValueChange={setSlotName}>
+                <SelectTrigger className="w-full bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/20">
+                  <SelectValue placeholder="Select pill slot" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border z-50">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <SelectItem key={i} value={`pill_${i + 1}`}>
+                      Pill {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </CardContent>
           </Card>
 
