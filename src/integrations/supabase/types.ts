@@ -25,6 +25,7 @@ export type Database = {
           last_taken_at: string | null
           name: string
           pills_count: number | null
+          slot_name: string | null
           snooze_duration: string | null
           updated_at: string
           user_id: string
@@ -39,6 +40,7 @@ export type Database = {
           last_taken_at?: string | null
           name: string
           pills_count?: number | null
+          slot_name?: string | null
           snooze_duration?: string | null
           updated_at?: string
           user_id: string
@@ -53,6 +55,7 @@ export type Database = {
           last_taken_at?: string | null
           name?: string
           pills_count?: number | null
+          slot_name?: string | null
           snooze_duration?: string | null
           updated_at?: string
           user_id?: string
