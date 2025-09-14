@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format, startOfWeek, addDays, isToday } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+
 
 interface PillChartData {
   day: string;
@@ -163,11 +163,11 @@ const PillDetails = () => {
         if (pill.dose2_time) scheduledDoses++;
         if (pill.dose3_time) scheduledDoses++;
 
-        // Format last taken time (IST)
+        // Format last taken time (show as stored IST, no extra offset)
         let lastTaken = '';
         if (pill.last_taken_at) {
           const date = new Date(pill.last_taken_at);
-          lastTaken = `${formatInTimeZone(date, 'Asia/Kolkata', 'MMM dd, HH:mm')} IST`;
+          lastTaken = format(date, 'yyyy-MM-dd HH:mm');
         }
 
         // Calculate next intake
