@@ -69,7 +69,7 @@ serve(async (req) => {
         pillData.dose1_time,
         pillData.dose2_time, 
         pillData.dose3_time
-      ].filter(Boolean).sort();
+      ].filter(Boolean).map(time => time.substring(0, 5)).sort();
 
       for (const dose of doses) {
         if (dose && dose > currentTimeIST) {
@@ -109,9 +109,9 @@ serve(async (req) => {
       lastTaken: getLastTaken(),
       isLowStock: (pillData.pills_count || 0) <= 5,
       doseTimes: {
-        dose1: pillData.dose1_time,
-        dose2: pillData.dose2_time,
-        dose3: pillData.dose3_time
+        dose1: pillData.dose1_time ? pillData.dose1_time.substring(0, 5) : null,
+        dose2: pillData.dose2_time ? pillData.dose2_time.substring(0, 5) : null,
+        dose3: pillData.dose3_time ? pillData.dose3_time.substring(0, 5) : null
       },
       intervalDays: pillData.interval_days,
       snoozeDuration: pillData.snooze_duration

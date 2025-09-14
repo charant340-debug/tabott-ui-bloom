@@ -71,9 +71,9 @@ const Reschedule = () => {
         setPillName(pill.name);
         setSlotName(pill.slot_name || "");
         setInterval(pill.interval_days.toString());
-        setDose1Time(pill.dose1_time || "08:00");
-        setDose2Time(pill.dose2_time || "");
-        setDose3Time(pill.dose3_time || "");
+        setDose1Time(pill.dose1_time ? pill.dose1_time.substring(0, 5) : "08:00");
+        setDose2Time(pill.dose2_time ? pill.dose2_time.substring(0, 5) : "");
+        setDose3Time(pill.dose3_time ? pill.dose3_time.substring(0, 5) : "");
         setPillsToAdd(pill.pills_count?.toString() || "");
         setSnoozeTime(pill.snooze_duration || "30 mins");
         

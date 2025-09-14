@@ -173,7 +173,7 @@ const PillDetails = () => {
         // Calculate next intake
         let nextIntake = 'Not scheduled';
         if (pill.dose1_time) {
-          nextIntake = pill.dose1_time;
+          nextIntake = pill.dose1_time.substring(0, 5);
         }
 
         setPillData({
@@ -216,9 +216,9 @@ const PillDetails = () => {
     if (!pillData) return [];
     
     const times = [];
-    if (pillData.dose1_time) times.push(pillData.dose1_time);
-    if (pillData.dose2_time) times.push(pillData.dose2_time);
-    if (pillData.dose3_time) times.push(pillData.dose3_time);
+    if (pillData.dose1_time) times.push(pillData.dose1_time.substring(0, 5));
+    if (pillData.dose2_time) times.push(pillData.dose2_time.substring(0, 5));
+    if (pillData.dose3_time) times.push(pillData.dose3_time.substring(0, 5));
     
     return times;
   };

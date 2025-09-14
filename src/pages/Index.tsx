@@ -55,7 +55,7 @@ const Index = () => {
             // Calculate next intake based on dose times
             let nextIntake = 'Not scheduled';
             if (pill.dose1_time) {
-              nextIntake = pill.dose1_time;
+              nextIntake = pill.dose1_time.substring(0, 5);
             }
 
             return {
