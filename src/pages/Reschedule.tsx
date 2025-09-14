@@ -113,9 +113,9 @@ const Reschedule = () => {
         name: pillName,
         slot_name: slotName || null,
         interval_days: parseInt(interval),
-        dose1_time: dose1Time || null,
-        dose2_time: dose2Time || null,
-        dose3_time: dose3Time || null,
+        dose1_time: dose1Time ? dose1Time.substring(0, 5) : null,
+        dose2_time: dose2Time ? dose2Time.substring(0, 5) : null,
+        dose3_time: dose3Time ? dose3Time.substring(0, 5) : null,
         pills_count: pillsToAdd ? parseInt(pillsToAdd) : 0,
         snooze_duration: snoozeTime,
       };
