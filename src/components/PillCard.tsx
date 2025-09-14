@@ -76,7 +76,7 @@ const PillCard: React.FC<PillCardProps> = ({
       
       let formattedTime;
       if (isToday(intakeDate)) {
-        formattedTime = `Today, ${timeOnly}`;
+        formattedTime = `Today,${timeOnly}`;
       } else if (isYesterday(intakeDate)) {
         formattedTime = `Yesterday, ${timeOnly}`;
       } else {
