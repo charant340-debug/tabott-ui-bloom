@@ -102,7 +102,7 @@ const PillCard: React.FC<PillCardProps> = ({
         {!loading && (lastTakenData || lastTakenData === null) && (
           <div className="text-right">
             <div className="text-xs text-muted-foreground">Last Taken</div>
-            <div className="text-sm font-medium text-secondary">{lastTakenData || 'N/A'}</div>
+            <div className="text-sm font-medium text-foreground">{lastTakenData || 'N/A'}</div>
           </div>
         )}
       </div>
