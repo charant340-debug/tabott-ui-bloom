@@ -171,6 +171,34 @@ Deno.serve(async (req) => {
     // Prepare tracking data only for new pills
     const trackingDataArray = newPillIds.map(pillId => {
       const pillData = pills[pillId]
+      
+      // Convert intake strings to proper ISO timestamps if they exist
+      const convertToTimestamp = (intakeStr: string | null) => {
+        if (!intakeStr) return null;
+        
+        // If it's already an ISO string, return as-is
+        if (intakeStr.includes('T') && intakeStr.includes('Z')) {
+          return intakeStr;
+        }
+        
+        // If it's just a time (HH:mm), combine with the date
+        if (intakeStr.match(/^\d{1,2}:\d{2}$/)) {
+          return `${formattedDate}T${intakeStr.padStart(5, '0')}:00.000Z`;
+        }
+        
+        // Try to parse as date and convert to ISO
+        try {
+          const date = new Date(intakeStr);
+          if (!isNaN(date.getTime())) {
+            return date.toISOString();
+          }
+        } catch (e) {
+          console.warn('Could not parse intake time:', intakeStr);
+        }
+        
+        return intakeStr; // Return original if we can't parse it
+      };
+      
       return {
         id: pillId,
         user_id: user_id,
@@ -178,9 +206,9 @@ Deno.serve(async (req) => {
         taken: pillData.taken || 0,
         to_be_taken: pillData.to_be_taken || 0,
         skipped: pillData.skipped || 0,
-        first_intake: pillData.first_intake || null,
-        second_intake: pillData.second_intake || null,
-        third_intake: pillData.third_intake || null,
+        first_intake: convertToTimestamp(pillData.first_intake),
+        second_intake: convertToTimestamp(pillData.second_intake),
+        third_intake: convertToTimestamp(pillData.third_intake),
       }
     })
 
