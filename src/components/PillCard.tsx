@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { format, isToday, isYesterday } from 'date-fns';
+import { subDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -75,9 +75,13 @@ const PillCard: React.FC<PillCardProps> = ({
       const timeOnly = formatInTimeZone(intakeDate, 'UTC', 'HH:mm');
       
       let formattedTime;
-      if (isToday(intakeDate)) {
+      const dateUTC = formatInTimeZone(intakeDate, 'UTC', 'yyyy-MM-dd');
+      const todayUTC = formatInTimeZone(new Date(), 'UTC', 'yyyy-MM-dd');
+      const yesterdayUTC = formatInTimeZone(subDays(new Date(), 1), 'UTC', 'yyyy-MM-dd');
+
+      if (dateUTC === todayUTC) {
         formattedTime = `Today, ${timeOnly}`;
-      } else if (isYesterday(intakeDate)) {
+      } else if (dateUTC === yesterdayUTC) {
         formattedTime = `Yesterday, ${timeOnly}`;
       } else {
         formattedTime = formatInTimeZone(intakeDate, 'UTC', 'MMM dd');
