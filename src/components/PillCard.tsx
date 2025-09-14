@@ -26,7 +26,7 @@ const PillCard: React.FC<PillCardProps> = ({
   const [lastTakenData, setLastTakenData] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch last taken data from pills table (last_taken_at column)
+  // Fetch last taken data from tracking table (latest intake time)
   const fetchLastTaken = async () => {
     try {
       // Get current user
@@ -36,25 +36,54 @@ const PillCard: React.FC<PillCardProps> = ({
         return;
       }
 
-      const { data: pill, error } = await supabase
-        .from('pills')
-        .select('last_taken_at')
+      // Get the most recent tracking data for this pill
+      const { data: trackingData, error } = await supabase
+        .from('tracking')
+        .select('first_intake, second_intake, third_intake, date')
         .eq('id', pillId)
         .eq('user_id', user.id)
-        .single();
+        .order('date', { ascending: false })
+        .limit(10);
 
       if (error) {
-        console.error('Error fetching last taken data:', error);
+        console.error('Error fetching tracking data:', error);
         setLastTakenData(null);
         return;
       }
 
-      if (!pill || !pill.last_taken_at) {
+      if (!trackingData || trackingData.length === 0) {
         setLastTakenData(null);
         return;
       }
 
-      const formattedTime = formatInTimeZone(new Date(pill.last_taken_at), 'Asia/Kolkata', 'MMM dd, HH:mm');
+      // Find the latest intake time across all recent records
+      let latestIntake: string | null = null;
+      
+      for (const record of trackingData) {
+        const intakeTimes = [
+          record.third_intake,
+          record.second_intake,
+          record.first_intake
+        ].filter(Boolean);
+
+        if (intakeTimes.length > 0) {
+          // Get the most recent intake from this record
+          const mostRecentInRecord = intakeTimes.sort((a, b) => 
+            new Date(b).getTime() - new Date(a).getTime()
+          )[0];
+
+          if (!latestIntake || new Date(mostRecentInRecord) > new Date(latestIntake)) {
+            latestIntake = mostRecentInRecord;
+          }
+        }
+      }
+
+      if (!latestIntake) {
+        setLastTakenData(null);
+        return;
+      }
+
+      const formattedTime = formatInTimeZone(new Date(latestIntake), 'Asia/Kolkata', 'MMM dd, HH:mm');
       setLastTakenData(formattedTime);
     } catch (error) {
       console.error('Error:', error);
