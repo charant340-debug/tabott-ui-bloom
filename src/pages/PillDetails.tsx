@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pill } from 'lucide-react';
+import { ArrowLeft, Pill, Clock } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -351,8 +351,14 @@ const PillDetails = () => {
 
             {/* Last Taken positioned at bottom right */}
             <div className="flex justify-end mb-6">
-              <div className="text-sm text-muted-foreground">
-                Last Taken: <span className="text-foreground font-medium">{pillData.lastTaken || 'N/A'}</span>
+              <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg px-4 py-3 border border-border/30 backdrop-blur-sm animate-fade-in">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-primary animate-pulse" />
+                  <span className="text-sm text-muted-foreground">Last Taken:</span>
+                  <span className="text-foreground font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    {pillData.lastTaken || 'N/A'}
+                  </span>
+                </div>
               </div>
             </div>
 
