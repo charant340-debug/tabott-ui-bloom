@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfWeek, addDays } from 'date-fns';
+import { format, subDays, isToday } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ChartData {
@@ -13,11 +13,10 @@ const PillChart: React.FC = () => {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Generate chart data for the past 7 days
+  // Generate chart data for the past 7 days (rolling window, today on the right)
   const generateChartData = async (): Promise<ChartData[]> => {
     try {
       const today = new Date();
-      const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday
       
       // Get all user's pills to calculate total scheduled doses
       const { data: pills, error: pillsError } = await supabase
@@ -39,7 +38,8 @@ const PillChart: React.FC = () => {
       }, 0) || 0;
 
       const chartDataPromises = Array.from({ length: 7 }, async (_, index) => {
-        const date = addDays(startOfCurrentWeek, index);
+        // Count backwards from today (6 days ago, 5 days ago, ..., today)
+        const date = subDays(today, 6 - index);
         const dateStr = format(date, 'yyyy-MM-dd');
         
         // Get tracking data for this date
@@ -60,7 +60,7 @@ const PillChart: React.FC = () => {
           date: format(date, 'd'),
           pillsTaken: totalTaken,
           totalScheduled: totalScheduledPerDay,
-          isToday: format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+          isToday: isToday(date)
         };
       });
 
@@ -98,7 +98,8 @@ const PillChart: React.FC = () => {
       <div className="flex items-end justify-between flex-1 gap-3">
         {chartData.map((data, index) => {
         const height = data.pillsTaken / maxPills * 100;
-        return <div key={data.day} className="flex-1 flex flex-col items-center group cursor-pointer">
+        return <div key={`${data.day}-${data.date}`} className="flex-1 flex flex-col items-center group cursor-pointer animate-slide-in-right"
+                    style={{ animationDelay: `${index * 50}ms` }}>
               {/* Pill count - always visible */}
               <div className={`text-sm font-bold mb-2 min-h-[20px] flex items-end ${
                 data.isToday ? 'text-accent' : 'text-primary'
