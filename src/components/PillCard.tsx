@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz/formatInTimeZone';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PillCardProps {
@@ -26,7 +26,7 @@ const PillCard: React.FC<PillCardProps> = ({
   const [lastTakenData, setLastTakenData] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch last taken data from pills.last_taken_at column
+  // Fetch last taken data from tracking table: latest row by date, then latest intake time
   const fetchLastTaken = async () => {
     try {
       // Get current user
@@ -36,27 +36,41 @@ const PillCard: React.FC<PillCardProps> = ({
         return;
       }
 
-      // Get the pill's last_taken_at timestamp
-      const { data: pill, error } = await supabase
-        .from('pills')
-        .select('last_taken_at')
+      // Get the most recent tracking row (by date) for this pill
+      const { data: latestRow, error } = await supabase
+        .from('tracking')
+        .select('first_intake, second_intake, third_intake, date')
         .eq('id', pillId)
         .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching pill data:', error);
+        console.error('Error fetching tracking data:', error);
         setLastTakenData(null);
         return;
       }
 
-      if (!pill || !pill.last_taken_at) {
+      if (!latestRow) {
         setLastTakenData(null);
         return;
       }
 
-      // Format the timestamp in IST
-      const formattedTime = formatInTimeZone(new Date(pill.last_taken_at), 'Asia/Kolkata', 'MMM dd, HH:mm');
+      // Determine the latest intake within this row
+      const intakeTimes = [latestRow.first_intake, latestRow.second_intake, latestRow.third_intake]
+        .filter(Boolean) as string[];
+
+      if (intakeTimes.length === 0) {
+        setLastTakenData(null);
+        return;
+      }
+
+      const latestIntake = intakeTimes.reduce((max, cur) =>
+        new Date(cur).getTime() > new Date(max).getTime() ? cur : max
+      );
+
+      const formattedTime = formatInTimeZone(new Date(latestIntake), 'Asia/Kolkata', 'MMM dd, HH:mm');
       setLastTakenData(formattedTime);
     } catch (error) {
       console.error('Error:', error);
