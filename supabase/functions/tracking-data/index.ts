@@ -62,6 +62,18 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Convert date format from DD-M-YYYY to YYYY-MM-DD
+    let formattedDate = date;
+    if (typeof date === 'string' && date.includes('-')) {
+      const dateParts = date.split('-');
+      if (dateParts.length === 3) {
+        const [day, month, year] = dateParts;
+        formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+    }
+    
+    console.log('Original date:', date, 'Formatted date:', formattedDate);
+
     if (typeof pills !== 'object' || Object.keys(pills).length === 0) {
       return new Response(
         JSON.stringify({ error: 'Pills must be an object with at least one pill' }),
@@ -124,7 +136,7 @@ Deno.serve(async (req) => {
       .from('tracking')
       .select('id')
       .eq('user_id', user_id)
-      .eq('date', date)
+      .eq('date', formattedDate)
       .in('id', pillIds)
 
     if (existingError) {
@@ -162,7 +174,7 @@ Deno.serve(async (req) => {
       return {
         id: pillId,
         user_id: user_id,
-        date: date,
+        date: formattedDate,
         taken: pillData.taken || 0,
         to_be_taken: pillData.to_be_taken || 0,
         skipped: pillData.skipped || 0,
