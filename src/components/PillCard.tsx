@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -71,7 +71,18 @@ const PillCard: React.FC<PillCardProps> = ({
         new Date(cur).getTime() > new Date(max).getTime() ? cur : max
       );
 
-      const formattedTime = formatInTimeZone(new Date(latestIntake), 'UTC', 'yyyy-MM-dd HH:mm');
+      const intakeDate = new Date(latestIntake);
+      const timeOnly = formatInTimeZone(intakeDate, 'UTC', 'HH:mm');
+      
+      let formattedTime;
+      if (isToday(intakeDate)) {
+        formattedTime = `Today, ${timeOnly}`;
+      } else if (isYesterday(intakeDate)) {
+        formattedTime = `Yesterday, ${timeOnly}`;
+      } else {
+        formattedTime = formatInTimeZone(intakeDate, 'UTC', 'MMM dd');
+      }
+      
       setLastTakenData(formattedTime);
     } catch (error) {
       console.error('Error:', error);
