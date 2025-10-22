@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { Pill, LogOut, User, Settings, ChevronDown, UserCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -116,7 +116,7 @@ const Index = () => {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem className="cursor-pointer" asChild>
                     <Link to="/profile" className="flex items-center">
-                      <User className="h-4 w-4 mr-2" />
+                      <UserCircle className="h-4 w-4 mr-2" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
